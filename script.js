@@ -20,12 +20,7 @@ window.onload = (event) => {
 
 
 
-const today_date = new Date();
-const year = today_date.getFullYear();
-const month = String(today_date.getMonth() + 1).padStart(2, '0');
-const day = String(today_date.getDate()).padStart(2, '0');
-const today = `${year}-${month}-${day}`;
-
+const today = new Date().toISOString();
 
 const apiUrl = `http://127.0.0.1:5000/get_events_by/${today}`;
 
@@ -37,5 +32,5 @@ fetch(apiUrl)
   .catch(error => {
     console.error('Error:', error);
   });
-}
+
 
