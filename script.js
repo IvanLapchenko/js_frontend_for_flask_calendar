@@ -1,22 +1,27 @@
 window.onload = (event) => {
-    const form = document.getElementById('add-new-event');
+const form = document.querySelector('#add-new-event');
 
-    form.addEventListener('submit', (event) => {
-    event.preventDefault();
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
 
-    const formData = new FormData(form);
+  const formData = new FormData(form);
+  const data = {};
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://127.0.0.1:5000/create_event', true);
+  for (const [key, value] of formData.entries()) {
+    data[key] = value;
+  }
 
-    xhr.onreadystatechange = function() {
-        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            console.log('Data successfully sent');
-        }
-    }
-    xhr.send(formData);
-    });
-}
+  fetch('http://127.0.0.1:5000/create_event', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+});
+
 
 
 
@@ -33,4 +38,4 @@ fetch(apiUrl)
     console.error('Error:', error);
   });
 
-
+}
