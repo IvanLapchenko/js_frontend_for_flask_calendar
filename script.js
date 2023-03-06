@@ -30,7 +30,9 @@ window.onload = (event) => {
     }
 
     function homeHandler () {
-        console.log("Home")
+        const today = new Date().toISOString();
+        getEventsByDate(today)
+        .then(data => console.log(data))
     }
 
     function sendRequestToServer(form, url) {
@@ -68,17 +70,15 @@ window.onload = (event) => {
     }
 
 
-//    const today = new Date().toISOString();
-//
-//    const apiUrl = `http://127.0.0.1:5000/get_events_by/${today}`;
-//
-//    fetch(apiUrl)
-//      .then(response => response.json())
-//      .then(data => {
-//        console.log(data);
-//      })
-//      .catch(error => {
-//        console.error('Error:', error);
-//      });
+    function getEventsByDate (date) {
+
+        const apiUrl = `http://127.0.0.1:5000/get_events_by/${date}`;
+
+        return fetch(apiUrl)
+          .then(response => response.json())
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        }
 
 }
