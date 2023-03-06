@@ -41,6 +41,13 @@ window.onload = (event) => {
         .then(data => console.log(data))
     }
 
+
+    function logout () {
+        localStorage.removeItem('jwt');
+        location.replace('/index.html');
+    }
+
+
     function sendRequestToServer(form, url) {
 
       const formData = new FormData(form);
@@ -81,11 +88,15 @@ window.onload = (event) => {
         console.log(token)
         const apiUrl = `http://127.0.0.1:5000/get_events_by/${date}`;
 
+        const myHeaders = new Headers();
+        myHeaders.append(Authorization, `Bearer ${token}`);
+
         return fetch(apiUrl, {
             method: "GET",
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }})
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+                }
+          })
           .then(response => response.json())
           .catch(error => {
             console.error('Error:', error);
