@@ -26,7 +26,14 @@ window.onload = (event) => {
     }
 
     function signupHandler () {
-        console.log("Signup")
+        const loginForm = document.querySelector('#signup-form');
+        const urlLogin = 'http://127.0.0.1:5000/signup';
+
+        loginForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                sendRequestToServer(event.target, urlLogin)
+                .then(data => console.log(data))
+        })
     }
 
     function homeHandler () {
