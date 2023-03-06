@@ -13,10 +13,8 @@ window.onload = (event) => {
     function loginHandler () {
         const loginForm = document.querySelector('#login-form');
         const urlLogin = 'http://127.0.0.1:5000/login';
-        console.log('a')
         loginForm.addEventListener('submit', (event) => {
                 event.preventDefault();
-                console.log(event.target);
                 sendRequestToServer(event.target, urlLogin)
                 .then(data => {
                     localStorage.setItem('token', data.token);
@@ -30,6 +28,14 @@ window.onload = (event) => {
     }
 
     function homeHandler () {
+        const eventForm = document.querySelector('#add-new-event');
+        const urlEvent = 'http://127.0.0.1:5000/create_event';
+        eventForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                sendRequestToServer(event.target, urlEvent)
+                .then(data =>  console.log(data))
+        })
+
         const today = new Date().toISOString();
         getEventsByDate(today)
         .then(data => console.log(data))
@@ -71,10 +77,15 @@ window.onload = (event) => {
 
 
     function getEventsByDate (date) {
-
+        const token = localStorage.getItem('token');
+        console.log(token)
         const apiUrl = `http://127.0.0.1:5000/get_events_by/${date}`;
 
-        return fetch(apiUrl)
+        return fetch(apiUrl, {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }})
           .then(response => response.json())
           .catch(error => {
             console.error('Error:', error);
