@@ -20,7 +20,9 @@ window.onload = (event) => {
                 sendRequestToServer(event.target, urlLogin)
                 .then(data => {
                     localStorage.setItem('token', data.token);
-                    console.log(data);
+                    if ( data.isLogged ) {
+                                location.replace('/index.html')
+                    };
                 })
         })
     }
@@ -32,9 +34,12 @@ window.onload = (event) => {
         loginForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 sendRequestToServer(event.target, urlLogin)
-                .then(data => console.log(data))
+                .then(data => {
+                    if ( data.isAddedToDB ) {
+                                location.replace('/login.html')
+                    };
         })
-    }
+    })}
 
     function homeHandler () {
         const logoutButton = document.querySelector('#logout');
