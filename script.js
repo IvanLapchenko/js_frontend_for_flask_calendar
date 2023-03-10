@@ -46,27 +46,15 @@ window.onload = (event) => {
         const eventForm = document.querySelector('#add-new-event');
         const urlEvent = 'http://127.0.0.1:5000/create_event';
 
-        const endDate = new Date();
-        // Дата, яка є 5 днів пізніше від поточної дати
-        endDate.setDate(endDate.getDate() + 5);
-        let currentDate = new Date();
-
-        while (currentDate <= endDate) {
-            console.log(currentDate)
-            date = currentDate.toISOString();
-            let dateToDisplay = convertStringToDate(currentDate);
-
-            getEventsByDate(date)
-            .then(data => showEvents(data, dateToDisplay))
-            // Перейти до наступної дати
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+        renderEventsForFiveDays();
 
 
         eventForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 sendRequestToServer(event.target, urlEvent)
                 .then(data =>  console.log(data))
+
+
         })
 
         logoutButton.addEventListener('click', (event) => {
@@ -74,9 +62,9 @@ window.onload = (event) => {
         })
     }
 
-function convertStringToDate(str) {
-  return new Date(str).toLocaleDateString();
-}
+    function convertStringToDate(str) {
+        return new Date(str).toLocaleDateString();
+    }
 
     function logout () {
         localStorage.removeItem('token');
@@ -197,5 +185,21 @@ function convertStringToDate(str) {
     }
 
 
+    function renderEventsForFiveDays () {
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 5);
+        let currentDate = new Date();
+
+        while (currentDate <= endDate) {
+            console.log(currentDate)
+            date = currentDate.toISOString();
+            let dateToDisplay = convertStringToDate(currentDate);
+
+            getEventsByDate(date)
+            .then(data => showEvents(data, dateToDisplay))
+            // Перейти до наступної дати
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+    }
 
 }
