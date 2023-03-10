@@ -7,31 +7,37 @@
     <script src="script.js"></script>
 </head>
 <body>
+<div class="container text-center mt-2">
+     <button type="button" id="logout" class="btn btn-primary">Log out</button>
+</div>
 
-    <div class="container">
-        <button type="button" id="logout" class="btn btn-primary">Log out</button>
+<div class="container" id="events-for-five-days">
+
+</div>
+
+<div class="container">
 
 
 
-      <form id="add-new-event" class="p-5 bg-light" method="post">
+    <form id="add-new-event" class="p-5 bg-light" method="post">
         <div class="form-group">
-          <label for="date">Date: </label>
-          <input type="date" id="date" name="date" class="form-control">
+            <label for="date">Date: </label>
+            <input type="date" id="date" name="date" class="form-control">
         </div>
         <div class="form-group">
-          <label for="time">Time: </label>
-          <input type="time" id="time" name="time" class="form-control">
+            <label for="time">Time: </label>
+            <input type="time" id="time" name="time" class="form-control">
         </div>
         <div class="form-group">
-          <label for="header">Name of the event: </label>
-          <input type="text" id="header" name="header" class="form-control">
+            <label for="header">Name of the event: </label>
+            <input type="text" id="header" name="header" class="form-control">
         </div>
         <div class="form-group">
-          <label for="describe">Description:</label>
-          <textarea id="describe" name="describe" class="form-control"></textarea>
+            <label for="describe">Description:</label>
+            <textarea id="describe" name="describe" class="form-control"></textarea>
         </div>
-          <input type="submit" class="btn btn-primary" value="Add event">
-      </form>
-    </div>
+        <input type="submit" class="btn btn-primary" value="Add event">
+    </form>
+</div>
 </body>
 </html>

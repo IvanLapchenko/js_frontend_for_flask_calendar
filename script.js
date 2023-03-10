@@ -45,10 +45,22 @@ window.onload = (event) => {
         const logoutButton = document.querySelector('#logout');
         const eventForm = document.querySelector('#add-new-event');
         const urlEvent = 'http://127.0.0.1:5000/create_event';
-        const today = new Date().toISOString();
 
-        getEventsByDate(today)
-        .then(data => console.log(data))
+        const endDate = new Date();
+        // Дата, яка є 5 днів пізніше від поточної дати
+        endDate.setDate(endDate.getDate() + 5);
+        let currentDate = new Date();
+
+        while (currentDate <= endDate) {
+            console.log(currentDate)
+            date = currentDate.toISOString();
+            let dateToDisplay = convertStringToDate(currentDate);
+
+            getEventsByDate(date)
+            .then(data => showEvents(data, dateToDisplay))
+            // Перейти до наступної дати
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
 
 
         eventForm.addEventListener('submit', (event) => {
@@ -62,6 +74,9 @@ window.onload = (event) => {
         })
     }
 
+function convertStringToDate(str) {
+  return new Date(str).toLocaleDateString();
+}
 
     function logout () {
         localStorage.removeItem('token');
@@ -122,5 +137,65 @@ window.onload = (event) => {
             console.error('Error:', error);
           });
     }
+
+
+    function showEvents(eventsFromAPI, date) {
+
+      // отримуємо div на сторінці та перетворюємо його на JS-об'єкт
+      const eventsDiv = document.getElementById('events-for-five-days');
+
+      console.log(eventsFromAPI)
+      // створоємо новий div для всіх подій на один день та додаємо йому клас single-day
+      const dayEventsDiv = document.createElement('div');
+      dayEventsDiv.classList.add('single-day');
+
+      // отримуємо дату з першого об'єкта та додаємо її для відображення перед подіями на цю дату
+      const displayData = document.createElement('h2');
+      displayData.textContent = date;
+      dayEventsDiv.appendChild(displayData);
+
+        // Прохід по кожному об'єкту та створення div-елемента з назвою та описом
+        eventsFromAPI.forEach( function (event) {
+        // перетворюємо дані на об'єкт, так як приходить масив рядків
+        event = JSON.parse(event)
+
+        // створюємо елемент h3, в якому буде відображатись назва події
+        const header = document.createElement('h3');
+        header.textContent = event.header;
+        // завдяки role="button" при наведенні буде змінюватись курсор
+        header.role = "button";
+
+        // створюємо елемент для відображення часу та, якщо час вказаний - відображаємо
+        const time = document.createElement('span');
+        if ( event.time !== undefined ) {
+            time.textContent = event.time;
+        }
+
+        // додаємо опис та приховуємо його
+        const describe = document.createElement('p');
+        describe.textContent = event.describe;
+        describe.style.display = 'none';
+
+
+        // Обробник події натискання на ім'я, змінюємо режим відображення
+        header.addEventListener('click', function() {
+          describe.style.display = describe.style.display === 'none' ? 'block' : 'none';
+        });
+
+
+        // Створення div-елемента з ім'ям та описом та додавання його до розмітки
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('single-event');
+        eventDiv.appendChild(header);
+        eventDiv.appendChild(time);
+        eventDiv.appendChild(describe);
+
+        dayEventsDiv.appendChild(eventDiv);
+
+      });
+        eventsDiv.appendChild(dayEventsDiv);
+    }
+
+
 
 }
