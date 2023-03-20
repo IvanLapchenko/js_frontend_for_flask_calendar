@@ -127,62 +127,81 @@ window.onload = (event) => {
     }
 
 
-    function showEvents(eventsFromAPI, date) {
+function showEvents(eventsFromAPI, date) {
 
-      // отримуємо div на сторінці та перетворюємо його на JS-об'єкт
-      const eventsDiv = document.getElementById('events-for-five-days');
+   // отримуємо div на сторінці та перетворюємо його на JS-об'єкт
+   const eventsDiv = document.getElementById('events-for-five-days');
 
-      console.log(eventsFromAPI)
-      // створоємо новий div для всіх подій на один день та додаємо йому клас single-day
-      const dayEventsDiv = document.createElement('div');
-      dayEventsDiv.classList.add('single-day');
+   // створоємо новий div для всіх подій на один день та додаємо йому клас single-day
+   const dayEventsDiv = document.createElement('div');
+   dayEventsDiv.classList.add('single-day');
 
-      // отримуємо дату з першого об'єкта та додаємо її для відображення перед подіями на цю дату
-      const displayData = document.createElement('h2');
-      displayData.textContent = date;
-      dayEventsDiv.appendChild(displayData);
+   // отримуємо дату з першого об'єкта та додаємо її для відображення перед подіями на цю дату
+   const displayData = document.createElement('h2');
+   displayData.textContent = date;
+   dayEventsDiv.appendChild(displayData);
 
-        // Прохід по кожному об'єкту та створення div-елемента з назвою та описом
-        eventsFromAPI.forEach( function (event) {
-        // перетворюємо дані на об'єкт, так як приходить масив рядків
-        event = JSON.parse(event)
+   // Прохід по кожному об'єкту та створення div-елемента з назвою та описом
+   eventsFromAPI.forEach(function(event) {
+     // перетворюємо дані на об'єкт, так як приходить масив рядків
+     event = JSON.parse(event)
 
-        // створюємо елемент h3, в якому буде відображатись назва події
-        const header = document.createElement('h3');
-        header.textContent = event.header;
-        // завдяки role="button" при наведенні буде змінюватись курсор
-        header.role = "button";
+     // створюємо елемент h3, в якому буде відображатись назва події
+     const header = document.createElement('h3');
+     header.textContent = event.header;
+     // завдяки role="button" при наведенні буде змінюватись курсор
+     header.role = "button";
 
-        // створюємо елемент для відображення часу та, якщо час вказаний - відображаємо
-        const time = document.createElement('span');
-        if ( event.time !== undefined ) {
-            time.textContent = event.time;
-        }
+     // створюємо елемент для відображення часу та, якщо час вказаний - відображаємо
+     const time = document.createElement('span');
+     if (event.time !== undefined) {
+       time.textContent = event.time;
+     }
 
-        // додаємо опис та приховуємо його
-        const describe = document.createElement('p');
-        describe.textContent = event.describe;
-        describe.style.display = 'none';
-
-
-        // Обробник події натискання на ім'я, змінюємо режим відображення
-        header.addEventListener('click', function() {
-          describe.style.display = describe.style.display === 'none' ? 'block' : 'none';
-        });
+     // додаємо опис та приховуємо його
+     const describe = document.createElement('p');
+     describe.value = event.describe;
+     describe.style.display = 'none';
 
 
-        // Створення div-елемента з ім'ям та описом та додавання його до розмітки
-        const eventDiv = document.createElement('div');
-        eventDiv.classList.add('single-event');
-        eventDiv.appendChild(header);
-        eventDiv.appendChild(time);
-        eventDiv.appendChild(describe);
+     // Обробник події натискання на ім'я, змінюємо режим відображення
+     header.addEventListener('click', function() {
+       describe.style.display = describe.style.display === 'none' ? 'block' : 'none';
+     });
 
-        dayEventsDiv.appendChild(eventDiv);
 
-      });
-        eventsDiv.appendChild(dayEventsDiv);
-    }
+     const deleteButton = document.createElement('button');
+     deleteButton.textContent = "Delete";
+     deleteButton.value = event.header;
+     deleteButton.addEventListener('click', () => sendDeleteRequest(deleteButton.value));
+
+
+     // Створення div-елемента з ім'ям та описом та додавання його до розмітки
+     const eventDiv = document.createElement('div');
+     eventDiv.classList.add('single-event');
+     eventDiv.appendChild(deleteButton);
+     eventDiv.appendChild(header);
+     eventDiv.appendChild(time);
+     eventDiv.appendChild(describe);
+
+     dayEventsDiv.appendChild(eventDiv);
+
+   });
+   eventsDiv.appendChild(dayEventsDiv);
+ }
+
+
+function sendDeleteRequest (eventData) {
+    const token = localStorage.getItem('token');
+    const deleteUrl = `http://127.0.0.1:5000/delete_event_by/${eventData}`;
+    fetch(deleteUrl, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}`}
+        })
+    .then(response => console.log(response));
+}
+
+
 
 
     function renderEventsForFiveDays () {
@@ -197,7 +216,6 @@ window.onload = (event) => {
 
             getEventsByDate(date)
             .then(data => showEvents(data, dateToDisplay))
-            // Перейти до наступної дати
             currentDate.setDate(currentDate.getDate() + 1);
         }
     }
