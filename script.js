@@ -127,69 +127,73 @@ window.onload = (event) => {
     }
 
 
+function createHeader(headerText) {
+  const header = document.createElement('h3');
+  header.textContent = headerText;
+  header.role = 'button';
+  return header;
+}
+
+function createTime(timeText) {
+  const time = document.createElement('span');
+  if (timeText !== undefined) {
+    time.textContent = timeText;
+  }
+  return time;
+}
+
+function createDescription(descriptionValue) {
+  const describe = document.createElement('p');
+  describe.value = descriptionValue;
+  describe.style.display = 'none';
+  return describe;
+}
+
+function createDeleteButton(headerText) {
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.value = headerText;
+  deleteButton.addEventListener('click', () => sendDeleteRequest(deleteButton.value));
+  return deleteButton;
+}
+
+function createEventDiv(event) {
+  const header = createHeader(event.header);
+  const time = createTime(event.time);
+  const describe = createDescription(event.describe);
+  const deleteButton = createDeleteButton(event.header);
+
+  header.addEventListener('click', function() {
+    describe.style.display = describe.style.display === 'none' ? 'block' : 'none';
+  });
+
+  const eventDiv = document.createElement('div');
+  eventDiv.classList.add('single-event');
+  eventDiv.appendChild(deleteButton);
+  eventDiv.appendChild(header);
+  eventDiv.appendChild(time);
+  eventDiv.appendChild(describe);
+
+  return eventDiv;
+}
+
 function showEvents(eventsFromAPI, date) {
+  const eventsDiv = document.getElementById('events-for-five-days');
+  const dayEventsDiv = document.createElement('div');
+  dayEventsDiv.classList.add('single-day');
 
-   // отримуємо div на сторінці та перетворюємо його на JS-об'єкт
-   const eventsDiv = document.getElementById('events-for-five-days');
+  const displayData = document.createElement('h2');
+  displayData.textContent = date;
+  dayEventsDiv.appendChild(displayData);
 
-   // створоємо новий div для всіх подій на один день та додаємо йому клас single-day
-   const dayEventsDiv = document.createElement('div');
-   dayEventsDiv.classList.add('single-day');
+  eventsFromAPI.forEach(function(event) {
+    event = JSON.parse(event);
+    const eventDiv = createEventDiv(event);
+    dayEventsDiv.appendChild(eventDiv);
+  });
 
-   // отримуємо дату з першого об'єкта та додаємо її для відображення перед подіями на цю дату
-   const displayData = document.createElement('h2');
-   displayData.textContent = date;
-   dayEventsDiv.appendChild(displayData);
-
-   // Прохід по кожному об'єкту та створення div-елемента з назвою та описом
-   eventsFromAPI.forEach(function(event) {
-     // перетворюємо дані на об'єкт, так як приходить масив рядків
-     event = JSON.parse(event)
-
-     // створюємо елемент h3, в якому буде відображатись назва події
-     const header = document.createElement('h3');
-     header.textContent = event.header;
-     // завдяки role="button" при наведенні буде змінюватись курсор
-     header.role = "button";
-
-     // створюємо елемент для відображення часу та, якщо час вказаний - відображаємо
-     const time = document.createElement('span');
-     if (event.time !== undefined) {
-       time.textContent = event.time;
-     }
-
-     // додаємо опис та приховуємо його
-     const describe = document.createElement('p');
-     describe.value = event.describe;
-     describe.style.display = 'none';
-
-
-     // Обробник події натискання на ім'я, змінюємо режим відображення
-     header.addEventListener('click', function() {
-       describe.style.display = describe.style.display === 'none' ? 'block' : 'none';
-     });
-
-
-     const deleteButton = document.createElement('button');
-     deleteButton.textContent = "Delete";
-     deleteButton.value = event.header;
-     deleteButton.addEventListener('click', () => sendDeleteRequest(deleteButton.value));
-
-
-     // Створення div-елемента з ім'ям та описом та додавання його до розмітки
-     const eventDiv = document.createElement('div');
-     eventDiv.classList.add('single-event');
-     eventDiv.appendChild(deleteButton);
-     eventDiv.appendChild(header);
-     eventDiv.appendChild(time);
-     eventDiv.appendChild(describe);
-
-     dayEventsDiv.appendChild(eventDiv);
-
-   });
-   eventsDiv.appendChild(dayEventsDiv);
- }
-
+  eventsDiv.appendChild(dayEventsDiv);
+}
 
 function sendDeleteRequest (eventData) {
     const token = localStorage.getItem('token');
@@ -201,22 +205,19 @@ function sendDeleteRequest (eventData) {
     .then(response => console.log(response));
 }
 
+function renderEventsForFiveDays () {
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 5);
+    let currentDate = new Date();
 
+    while (currentDate <= endDate) {
+        console.log(currentDate)
+        date = currentDate.toISOString();
+        let dateToDisplay = convertStringToDate(currentDate);
 
-
-    function renderEventsForFiveDays () {
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 5);
-        let currentDate = new Date();
-
-        while (currentDate <= endDate) {
-            console.log(currentDate)
-            date = currentDate.toISOString();
-            let dateToDisplay = convertStringToDate(currentDate);
-
-            getEventsByDate(date)
-            .then(data => showEvents(data, dateToDisplay))
-            currentDate.setDate(currentDate.getDate() + 1);
+        getEventsByDate(date)
+        .then(data => showEvents(data, dateToDisplay))
+        currentDate.setDate(currentDate.getDate() + 1);
         }
     }
 
